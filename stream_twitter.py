@@ -11,7 +11,6 @@ from unidecode import unidecode
 import time
 from threading import Lock, Timer
 import pandas as pd
-from textblob import TextBlob
 
 sys.path.insert(0, os.path.realpath(os.path.dirname(__file__)))
 os.chdir(os.path.realpath(os.path.dirname(__file__)))

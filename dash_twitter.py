@@ -60,29 +60,20 @@ def update_graph_scatter(sentiment_term):
         init_length = len(df)
         df['sentiment_smoothed'] = df['sentiment'].rolling(int(len(df)/5)).mean()
         df = df_resample_sizes(df)
-        
+
         X = df.index
         Y = df.sentiment_smoothed.values
-        Y2 = df.volume.values
 
         data = plotly.graph_objs.Scatter(
                 x=X,
                 y=Y,
                 name='Sentiment',
                 mode= 'lines',
-                yaxis='y2',
                 )
 
-        data2 = plotly.graph_objs.Bar(
-                x=X,
-                y=Y2,
-                name='Volume',
-                )
-
-        return {'data': [data,data2],'layout' : go.Layout(xaxis=dict(range=[min(X),max(X)]),
-                                                          yaxis=dict(range=[min(Y2),max(Y2*4)], title='Volume', side='right'),
-                                                          yaxis2=dict(range=[min(Y),max(Y)], side='left', overlaying='y',title='sentiment'),
-                                                          title='Live sentiment for: "{}"'.format(sentiment_term))}
+        return {'data': [data],'layout' : go.Layout(xaxis=dict(range=[min(X),max(X)]),
+                                                               yaxis=dict(range=[min(Y),max(Y)], side='left', overlaying='y',title='sentiment'),
+                                                               title='Live sentiment for: "{}"'.format(sentiment_term))}
 
     except Exception as e:
         with open('errors.txt','a') as f:
