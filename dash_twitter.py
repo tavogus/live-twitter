@@ -13,13 +13,11 @@ conn = sqlite3.connect('twitter.db', check_same_thread=False)
 
 MAX_DF_LENGTH = 100
 
-#popular topics: google, olympics, trump, gun, usa
-
 app = dash.Dash(__name__)
 app.layout = html.Div(
     [   html.H2('Live Twitter Sentiment'),
-        dcc.Input(id='sentiment_term', value='trump', type='text'),
-        dcc.Graph(id='live-graph', animate=True),
+        dcc.Input(id='sentiment_term', value='facebook', type='text'),
+        dcc.Graph(id='live-graph', animate=False),
         dcc.Interval(
             id='graph-update',
             interval=1*1000
@@ -55,15 +53,18 @@ def update_graph_scatter(sentiment_term):
             df = pd.read_sql("SELECT sentiment.* FROM sentiment_fts fts LEFT JOIN sentiment ON fts.rowid = sentiment.id WHERE fts.sentiment_fts MATCH ? ORDER BY fts.rowid DESC LIMIT 1000", conn, params=(sentiment_term+'*',))
         else:
             df = pd.read_sql("SELECT * FROM sentiment ORDER BY id DESC, unix DESC LIMIT 1000", conn)
+
         df.sort_values('unix', inplace=True)
         df['date'] = pd.to_datetime(df['unix'], unit='ms')
         df.set_index('date', inplace=True)
         init_length = len(df)
         df['sentiment_smoothed'] = df['sentiment'].rolling(int(len(df)/5)).mean()
         df = df_resample_sizes(df)
+        
         X = df.index
         Y = df.sentiment_smoothed.values
         Y2 = df.volume.values
+
         data = plotly.graph_objs.Scatter(
                 x=X,
                 y=Y,
